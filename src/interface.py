@@ -60,8 +60,10 @@ class CANInterface(NetworkInterface):
         return super().__init__(interface, NICTypeEnum.CAN)
 
     def send_message(self, can_id: int, data: list[int]) -> None:
-        print("send")
-        pass
+        timeout = 1.0
+        with can.Bus(channel=self.interface, interface='socketcan') as bus:
+            message = can.Message(arbitration_id=can_id, is_extended_id=True, data=data)
+            bus.send(message, timeout=timeout)
 
     def receive_message(self, timeout: int = 5) -> bytes:
         print("recv")
@@ -73,9 +75,8 @@ if __name__ == "__main__":
     
     ifc = CANInterface(interface)
 
-    with can.Bus(channel=interface, interface='socketcan') as bus:
-        message = can.Message(arbitration_id=123, is_extended_id=True, data=[0x11, 0x22, 0x33])
-        bus.send(message, timeout=0.2)
+    ifc.send_message(0x13, [0x14, 0xFF, 0x14])
+
 
 
 
