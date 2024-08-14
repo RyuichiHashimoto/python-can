@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 import can
+import time
 
 class NICTypeEnum(Enum):
     IP = auto()
@@ -58,24 +59,44 @@ class CANInterface(NetworkInterface):
 
     def __init__(self, interface: str):       
         super().__init__(interface, NICTypeEnum.CAN)
+        self.__already_shutdownd = False
+        self.__bus = can.Bus(channel=self.interface, interface='socketcan') 
+        
+    def __del__(self):
+        if self.__already_shutdownd:
+            return
+        
+        self.shutdown()
+
+    def shutdown(self):
+        self.__bus.shutdown()
+        self.__already_shutdownd = True
         
 
     def send_message(self, can_id: int, data: list[int]) -> None:
         timeout = 1.0
-        with can.Bus(channel=self.interface, interface='socketcan') as bus:
-            message = can.Message(arbitration_id=can_id, is_extended_id=True, data=data)
-            bus.send(message, timeout=timeout)
+        message = can.Message(arbitration_id=can_id, is_extended_id=True, data=data)
+        self.__bus.send(message, timeout=timeout)
 
-    def receive_message(self, timeout: int = 5) -> bytes | None:
-        
-        try:
-            with can.Bus(channel=self.interface, interface='socketcan') as bus:
-                message = bus.recv(timeout=10.0)  # 10秒間待機
+    def receive_message(self, can_id: int = None, timeout: int = 10) -> can.Message | None:
+        start_time = time.time()
+            
+        rest_timeout = timeout
+        while True:
+            message = self.__bus.recv(rest_timeout)
+            if message is None:
+                return None
+                        
+            if can_id is None:
                 return message
-        except can.CanError as e:
-            import traceback
-            traceback.print_exc()
-
+            
+            if message.arbitration_id == can_id:
+                return message
+            
+            elapsed_time = time.time() - start_time
+            if elapsed_time > timeout:
+                return None
+            rest_timeout = timeout - elapsed_time
 
 if __name__ == "__main__":
     interface = "can0"
