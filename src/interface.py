@@ -34,7 +34,7 @@ class NetworkInterface(ABC):
         raise NotImplementedError
         
     @abstractmethod
-    def receive_message(self, timeout: int = 5) -> bytes:
+    def receive_message(self, timeout: int = 5) -> bytes | None:
         """
         指定インターフェースからメッセージを送信する。
         
@@ -56,8 +56,9 @@ class NetworkInterface(ABC):
 
 class CANInterface(NetworkInterface):
 
-    def __init__(self, interface: str):
-        return super().__init__(interface, NICTypeEnum.CAN)
+    def __init__(self, interface: str):       
+        super().__init__(interface, NICTypeEnum.CAN)
+        
 
     def send_message(self, can_id: int, data: list[int]) -> None:
         timeout = 1.0
@@ -65,9 +66,15 @@ class CANInterface(NetworkInterface):
             message = can.Message(arbitration_id=can_id, is_extended_id=True, data=data)
             bus.send(message, timeout=timeout)
 
-    def receive_message(self, timeout: int = 5) -> bytes:
-        print("recv")
-        pass
+    def receive_message(self, timeout: int = 5) -> bytes | None:
+        
+        try:
+            with can.Bus(channel=self.interface, interface='socketcan') as bus:
+                message = bus.recv(timeout=10.0)  # 10秒間待機
+                return message
+        except can.CanError as e:
+            import traceback
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
@@ -75,7 +82,8 @@ if __name__ == "__main__":
     
     ifc = CANInterface(interface)
 
-    ifc.send_message(0x13, [0x14, 0xFF, 0x14])
+    # ifc.send_message(0x13, [0x14, 0xFF, 0x14])
+    ifc.receive_message(timeout=3)
 
 
 
