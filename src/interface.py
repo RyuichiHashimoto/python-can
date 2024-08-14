@@ -73,7 +73,7 @@ if __name__ == "__main__":
     
     ifc = CANInterface(interface)
 
-    with can.Bus(interface=interface) as bus:
+    with can.Bus(channel=interface, interface='socketcan') as bus:
         message = can.Message(arbitration_id=123, is_extended_id=True, data=[0x11, 0x22, 0x33])
         bus.send(message, timeout=0.2)
 
