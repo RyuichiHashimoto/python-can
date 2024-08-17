@@ -224,11 +224,9 @@ if __name__ == "__main__":
 
     xor_operand_list = []
     xor_operand_list = list([ i  for i in range(0x00, 0xFF+1)])
-    xor_operand_list = []
     for operand in xor_operand_list:
         if uds_challenge_response(session_mode, security_level, lambda x: xor_operator_each_bytes(x, operand)):
             print(xor_operator_each_bytes.__name__, operand)
             os._exit(0)
     
-    xor_operand_list = list([ [0x00 , i]  for i in range(0x00, 0xFF+1)] )
     
