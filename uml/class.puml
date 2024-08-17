@@ -1,0 +1,22 @@
+@startuml
+' クラスの定義
+
+class NetworkInterface {
+  - Interface: String
+  - NIC_Type: String
+  + getInterface(): String
+  + getNICType(): String
+  + sendMessage(bytes) : String
+  + recvMessage() : bytes | None
+}
+
+
+class CANInterface {
+  + sendMessage(bytes) : String
+  + recvMessage() : bytes | None
+}
+
+NetworkInterface <|-- CANInterface
+
+
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+
+actor Sender
+actor Receiver
+
+package "CAN-Communicaiton" {
+  usecase "send CAN Message" as uc_sender
+  usecase "receive CAN Message" as uc_receiver
+  usecase "CAN Interface Setting" as uc_interface
+  usecase "AnyTask" as uc_task
+}
+Sender --> uc_sender
+Receiver --> uc_sender
+
+Sender --> uc_receiver
+Receiver --> uc_receiver
+
+Sender --> uc_interface
+Receiver --> uc_interface
+
+Receiver --> uc_task
+
+@enduml
