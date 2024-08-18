@@ -36,15 +36,15 @@ if __name__ == "__main__":
     
 
     print(f'----------[can_id list in first interval]-------------')
-    print( ", ".join([list(canid_set1)]))
+    print( ", ".join(sorted(list(canid_set1))))
 
     print(f'----------[can_id list in second interval]-------------')
-    print( ", ".join([list(canid_set2)]))
+    print( ", ".join(sorted(list(canid_set2))))
 
     print(f'----------[cCAN ID set confirmed only in the first interval]-------------')
     ret_set1 = canid_set1 - canid_set2
-    print( ", ".join([list(ret_set1)]))
+    print( ", ".join(sorted(list(ret_set1))))
 
     print(f'----------[cCAN ID set confirmed only in the first interval]-------------')
     ret_set2 = canid_set2 - canid_set1
-    print( ", ".join([list(ret_set2)]))
+    print( ", ".join((list(ret_set2))))
