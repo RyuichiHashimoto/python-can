@@ -45,6 +45,6 @@ if __name__ == "__main__":
     ret_set1 = canid_set1 - canid_set2
     print( ", ".join(sorted(list(ret_set1))))
 
-    print(f'----------[cCAN ID set confirmed only in the first interval]-------------')
+    print(f'----------[cCAN ID set confirmed only in the second interval]-------------')
     ret_set2 = canid_set2 - canid_set1
     print( ", ".join((list(ret_set2))))
