@@ -18,7 +18,7 @@ if __name__ == "__main__":
                 
                 can_id = message.arbitration_id
                 
-                message_dict[can_id].append(message.data)
+                message_dict[can_id].add(message.data)
 
         except KeyboardInterrupt:
             pass
