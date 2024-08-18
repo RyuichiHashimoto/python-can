@@ -10,7 +10,7 @@ if __name__ == "__main__":
     
     can_interface = "can0"
 
-
+    print("sniffing...")
     timestamp_dict: dict[int, list[int]] = defaultdict(list[int])
     with can.interface.Bus(can_interface, bustype='socketcan') as bus:
         try:
